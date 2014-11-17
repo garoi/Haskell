@@ -1,6 +1,6 @@
 type Signature = [(String, Int)]
 type Position = [Int]
-type Subtitution = [(a, a)]
+data Subtitution a = Subtitution [(a, a)]
 
 class Rewrite a where
 
@@ -12,11 +12,11 @@ class Rewrite a where
 
 	-- rep dos objectes de tipus a i retorna una llista de parells de
 	-- position i subtitution del tipus a
-	match :: a -> a -> [(Position, Subtitution)]
+	match :: a -> a -> [(Position, Subtitution a)]
 
 	-- rep un objecte del tipus a, i una substitucio d’objectes de
 	-- tipus a, i retorna el resultat que sera un objecte del tipus a
-	apply :: a -> Subtitution -> a
+	apply :: a -> Subtitution a -> a
 
 	-- rep un objecte del tipus a i una llista de parells de position,
 	-- un altre objecte del tipus a i retorna el resultat, que sera del tipus a
@@ -33,6 +33,6 @@ instance Show ru => Show (Rule ru) where
 	show EmptyRule = ""
 	show (Rule a b) = (show a) ++ " --> " ++ (show b)
 
-
-
-
+instance Show rs => Show (RewriteSystem rs) where
+	show (RewriteSystem []) = []
+	show (RewriteSystem l) = show l
