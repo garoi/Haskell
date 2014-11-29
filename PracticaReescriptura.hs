@@ -12,7 +12,7 @@ class Rewrite a where
 
 	-- rep dos objectes de tipus a i retorna una llista de parells de
 	-- position i subtitution del tipus a
-	match :: a -> a -> [(Position, Substitution a)]
+	match :: a -> a -> [(Position, Substitution a)]-- [([Int], [(a,a)])]
 
 	-- rep un objecte del tipus a, i una substitucio d’objectes de
 	-- tipus a, i retorna el resultat que sera un objecte del tipus a
@@ -50,6 +50,7 @@ showRegles :: Show rs => [rs] -> [Char]
 showRegles [] = ""
 showRegles (x:xs) = (show x) ++ "\n" ++ showRegles xs
 
+
 validRule :: (Rewrite a) => Signature -> (Rule a) -> Bool
 validRule s (Rule a b) = (valid s a) && (valid s b)
 
@@ -79,44 +80,6 @@ myEqual (RString s1) (RString s2)
 	| s1 == s2 = True
 	| otherwise = False
 
-leftmost obj (l:ls) a b = applyAux obj a b [l]
-
-rightmost obj l a b = applyAux obj a b [(l !! ((length l) - 1))]
-
-oneStepRewrite :: (Rewrite a) => RewriteSystem a -> a -> (a -> [Int] -> a -> a -> a) -> a
-oneStepRewrite (RewriteSystem []) obj f = obj
-oneStepRewrite (RewriteSystem ((Rule a b):sistemes)) obj f
-	| matchToList (match obj a) /= [] = f obj (matchToList (match obj a)) a b
-	| otherwise = oneStepRewrite (RewriteSystem sistemes) obj f
-
-
-rewrite :: (Rewrite a) => RewriteSystem a -> a -> (a -> [Int] -> a -> a -> a) -> a
-rewrite (RewriteSystem s@((Rule a b):sistemes)) obj f
-	| matchToList (match obj a) /= [] = rewrite (RewriteSystem s) (evaluate (oneStepRewrite (RewriteSystem s) obj f)) f
-	| otherwise = final (RewriteSystem s) obj f
-
-final :: Rewrite a => RewriteSystem a -> a -> (a -> [Int] -> a -> a -> a) -> a
-final (RewriteSystem s@((Rule a b):sistemes)) obj f
-	| snd (rewriteAux (RewriteSystem sistemes) obj f) == True = obj
-	| otherwise = rewrite (RewriteSystem s) (fst (rewriteAux (RewriteSystem s) obj f)) f
-
-rewriteAux :: Rewrite a => RewriteSystem a -> a -> (a -> [Int] -> a -> a -> a) -> (a, Bool)
-rewriteAux (RewriteSystem []) obj f = (obj, True)
-rewriteAux (RewriteSystem s@((Rule a b):[])) obj f
-	| matchToList (match obj a) /= [] = ((evaluate (oneStepRewrite (RewriteSystem s) obj f)), False)
-	| otherwise = (obj, True)
-rewriteAux (RewriteSystem s@((Rule a b):sistemes)) obj f
-	| matchToList (match obj a) /= [] = ((evaluate (oneStepRewrite (RewriteSystem s) obj f)), False)
-	| otherwise = rewriteAux (RewriteSystem sistemes) obj f
-
-nrewrite :: (Rewrite a) => RewriteSystem a -> a -> (a -> [Int] -> a -> a -> a) -> Int -> a
-nrewrite (RewriteSystem s) obj f ite = nrewriteAux (RewriteSystem s) obj f ite 1
-
-nrewriteAux (RewriteSystem s) obj f ite ite2
-	| ite == ite2 = evaluate (oneStepRewrite (RewriteSystem s) obj f)
-	| otherwise = nrewriteAux (RewriteSystem s) (evaluate (oneStepRewrite (RewriteSystem s) obj f)) f (ite) (ite2 + 1)
-
-
 instance Rewrite RString where
 	getVars s = []
 
@@ -134,8 +97,6 @@ instance Rewrite RString where
 	replace s1 [] _ = s1
 	replace s1 (l:[]) s2 = replaceAux s1 l s2
 	replace s1 (l:ls) s2 = replace (replaceAux s1 l s2) ls s2
-
-	evaluate s1 = s1
 
 comprovarAux :: String -> [Char] -> Bool
 comprovarAux [] _ = False

@@ -6,11 +6,13 @@
 -- les definicions per linia de comandes del ghci.
 
 myStringSignature :: Signature
-myStringSignature = [("b",0),("w",0),("r",0)]
+let myStringSignature = [("b",0),("w",0),("r",0)]
 
-myStringSystem = readRStringSystem [("wb" , "bw" ),("rb" , "br" ),("rw" , "wr" )]
+let myStringSystem = readRStringSystem [("wb" , "bw" ),("rb" , "br" ),("rw" , "wr" )]
 
-myRString = readRString "wrrbbwrrwwbbwrbrbww"
+let myRString = readRString "wrrbbwrrwwbbwrbrbww"
+
+
 
 -- apply a (Subtitution [(b,c)])
 
